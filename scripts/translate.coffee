@@ -30,7 +30,6 @@ module.exports = (robot) ->
         catch err
           robot.emit 'error', err
           msg.send "I don't find any mean"
-
   # ------------------------------------------
   # translate to jp
   # ------------------------------------------
@@ -74,7 +73,7 @@ module.exports = (robot) ->
         try
           data = JSON.parse body
           meaning = ""
-          console.log(data.results.length)
+
           for i in [0...data.results.length]
             meaning += '** Kanji: ' + data.results[i].kanji + '\n'
             meaning += '\t+, 訓: ' + data.results[i].kun + '\n'
