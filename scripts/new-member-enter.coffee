@@ -1,6 +1,6 @@
 module.exports = (robot) ->
 	robot.enter (response) ->
-     	robot.messageRoom '@' + response.message.user.name, 
+     	robot.messageRoom '@' + response.message.user.name,
      					  'Hello ' + response.message.user.real_name + '\n' +
      					  'It\'s very nice to meet you! In order to know each other. I would like to introduce myself first.\n' +
      					  'My name is Maruko, let\'s call my Maruko chan or just Maruko o(^▽^)o\n' +

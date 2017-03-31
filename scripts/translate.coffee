@@ -1,19 +1,88 @@
-module.exports = (robot) ->
-  pattern = new RegExp('trans', 'i')
+wanakana = require("wanakana")
 
-  robot.hear pattern, (msg) ->
-    msg.http("http://mazii.net/api/search/%E9%A3%9F%E3%81%B9%E3%82%8B/20/1")
+module.exports = (robot) ->
+  pattern = new RegExp('trans (.*) to vi', 'i')
+  # translate jp to vi
+  # -----------------------------
+  robot.respond pattern, (msg) ->
+    keyword = msg.match[1]
+    if !wanakana.isHiragana(keyword) && !wanakana.isKatakana(keyword)
+      keyword = wanakana.toHiragana(keyword)
+
+    keywordEncode = encodeURIComponent(keyword)
+    # msg.send keyword
+    msg.http("http://mazii.net/api/search/#{keywordEncode}/20/1")
       .header('User-Agent', 'Mozilla/5.0')
       .get() (err, res, body) ->
-        if err
-          msg.send "Failed to connect to API"
-          robot.emit 'error', err, res
-          return
-
         data = null
         try
           data = JSON.parse body
-          msg.send data.data[0].means[0].mean
+
+          meaning = ""
+          for i in [0...data.data.length]
+            if data.data[i].phonetic in [keyword]
+              for j in [0...data.data[i].means.length]
+                meaning += '**(' + data.data[i].means[j].kind + ') ' + data.data[i].means[j].mean + '\n'
+                if data.data[i].means[j].examples
+                    meaning += '\t' + data.data[i].means[j].examples[0].content + '\n'
+                    meaning += '\t' + data.data[i].means[j].examples[0].mean + '\n'
+          msg.send meaning
         catch err
-          msg.send "Failed to parse API response"
           robot.emit 'error', err
+          msg.send "I don't find any mean"
+
+  # ------------------------------------------
+  # translate to jp
+  # ------------------------------------------
+  jppattern = new RegExp('trans (.*) to jp', 'i')
+  robot.respond jppattern, (msg) ->
+    keyword = msg.match[1]
+    keywordEncode = encodeURIComponent(keyword)
+    # msg.send keyword
+    msg.http("http://mazii.net/api/search/#{keywordEncode}/20/1")
+      .header('User-Agent', 'Mozilla/5.0')
+      .get() (err, res, body) ->
+        data = null
+        try
+          data = JSON.parse body
+
+          meaning = ""
+          for i in [0...data.data.length]
+            if data.data[i].word in [keyword]
+              for j in [0...data.data[i].means.length]
+                meaning += '**(' + data.data[i].means[j].kind + ') ' + data.data[i].means[j].mean + '\n'
+                if data.data[i].means[j].examples.length > 0
+                    meaning += '\t' + data.data[i].means[j].examples[0].content + '\n'
+                    meaning += '\t' + data.data[i].means[j].examples[0].mean + '\n'
+          msg.send meaning
+        catch err
+          robot.emit 'error', err
+          msg.send "I don't find any mean"
+
+  # ------------------------------------------
+  # Search kanji
+  # ------------------------------------------
+  kjpattern = new RegExp('search kanji of (.*)', 'i')
+  robot.respond kjpattern, (msg) ->
+    keyword = msg.match[1]
+    keywordEncode = encodeURIComponent(keyword)
+    # msg.send keyword
+    msg.http("http://mazii.net/api/mazii/#{keywordEncode}/10")
+      .header('User-Agent', 'Mozilla/5.0')
+      .get() (err, res, body) ->
+        data = null
+        try
+          data = JSON.parse body
+          meaning = ""
+          console.log(data.results.length)
+          for i in [0...data.results.length]
+            meaning += '** Kanji: ' + data.results[i].kanji + '\n'
+            meaning += '\t+, 訓: ' + data.results[i].kun + '\n'
+            meaning += '\t+, 音: ' + data.results[i].on + '\n'
+            # if data.data[i].means[j].examples.length > 0
+            #     meaning += '\t' + data.data[i].means[j].examples[0].content + '\n'
+            #     meaning += '\t' + data.data[i].means[j].examples[0].mean + '\n'
+          msg.send meaning
+        catch err
+          robot.emit 'error', err
+          msg.send "I don't find any mean"
