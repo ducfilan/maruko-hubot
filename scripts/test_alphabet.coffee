@@ -9,8 +9,8 @@ regex_patterns   = require './common/regex_patterns'
 
 UserState        = require './model/user_state'
 
-class Alphabet
-  constructor: (@responser, @baseApiUrl) ->
+class AlphabetTest
+  constructor: (@baseApiUrl) ->
 
   takeRandomLetterItem: (callback) ->
     filterDataPart = '?shallow=true'
@@ -27,20 +27,20 @@ class Alphabet
         callback jsonData
   isAnswering: (interactionType, interactionStatus) ->
     (
-      interactionType == custom_types.interaction.test_alphabet.hiragana or
-      interactionType == custom_types.interaction.test_alphabet.katakana
+      interactionType == custom_types.interaction.test.alphabet.hiragana or
+      interactionType == custom_types.interaction.test.alphabet.katakana
     ) and
     interactionStatus == custom_types.interaction_status.test.not_answered
 
 module.exports = (robot) ->
-  robot.respond regex_patterns.test_alphabet, (responser) ->
+  robot.respond regex_patterns.test.alphabet, (responser) ->
     username = responser.message.user.name
     userRequestQuery = responser.match[0]
     selectedTestKind = responser.match[1]
 
     robot.brain.set "#{username}_state",
                     new UserState username,
-                                  custom_types.interaction.test_alphabet[selectedTestKind],
+                                  custom_types.interaction.test.alphabet[selectedTestKind],
                                   custom_types.interaction_status.test.not_answered
 
     robot.brain.set "#{username}_request_query", userRequestQuery
@@ -48,7 +48,7 @@ module.exports = (robot) ->
 
     responser.send static_strings.en.test.alphabet.notice
 
-    alphabet = new Alphabet responser, "#{constants.firebaseUrl}/alphabet.json"
+    alphabet = new AlphabetTest "#{constants.firebaseUrl}/alphabet.json"
 
     alphabet.takeRandomLetterItem (item) ->
       letter = item[Object.keys(item)[0]]
@@ -66,7 +66,7 @@ module.exports = (robot) ->
 
     userState = robot.brain.get "#{username}_state" || null
     if userState != null
-      alphabet = new Alphabet responser, "#{constants.firebaseUrl}/alphabet.json"
+      alphabet = new AlphabetTest "#{constants.firebaseUrl}/alphabet.json"
       interactionType   = userState.getInteractionType()
       interactionStatus = userState.getInteractionStatus()
 
