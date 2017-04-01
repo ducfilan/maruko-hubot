@@ -5,7 +5,7 @@ http_request     = require './common/http_request'
 static_strings   = require './common/static_strings'
 helper_functions = require './common/helper_functions'
 custom_types     = require './common/custom_types'
-regex_patterns     = require './common/regex_patterns'
+regex_patterns   = require './common/regex_patterns'
 
 UserState        = require './model/user_state'
 
