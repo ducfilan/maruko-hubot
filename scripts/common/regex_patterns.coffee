@@ -1,4 +1,6 @@
 regex_patterns = module.exports =
   anything: /^(.*)$/
-  test_alphabet: /test.* alphabet.*? (hiragana|katakana)*/i
+  test:
+    alphabet: /test.* alphabet.*? (hiragana|katakana)*/i
+    general:  /test.* general.* lesson.* (\d+)/i
   stop: /stop/i
