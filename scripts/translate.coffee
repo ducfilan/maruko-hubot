@@ -1,12 +1,13 @@
-wanakana = require("wanakana")
+wanakana         = require 'wanakana'
+
+regex_patterns   = require './common/regex_patterns'
 
 module.exports = (robot) ->
-  pattern = new RegExp('trans (.*) to vi', 'i')
   # translate jp to vi
   # -----------------------------
-  robot.respond pattern, (msg) ->
+  robot.respond regex_patterns.translate.jap_to_vie, (msg) ->
     keyword = msg.match[1]
-    if !wanakana.isHiragana(keyword) && !wanakana.isKatakana(keyword)
+    if regex_patterns.common.latin_chars.test keyword
       keyword = wanakana.toHiragana(keyword)
 
     keywordEncode = encodeURIComponent(keyword)
@@ -22,10 +23,10 @@ module.exports = (robot) ->
           for i in [0...data.data.length]
             if data.data[i].phonetic in [keyword]
               for j in [0...data.data[i].means.length]
-                meaning += '**(' + data.data[i].means[j].kind + ') ' + data.data[i].means[j].mean + '\n'
+                meaning += '*(' + data.data[i].means[j].kind + ') ' + data.data[i].means[j].mean + '*\n'
                 if data.data[i].means[j].examples
-                    meaning += '\t' + data.data[i].means[j].examples[0].content + '\n'
-                    meaning += '\t' + data.data[i].means[j].examples[0].mean + '\n'
+                    meaning += '>' + data.data[i].means[j].examples[0].content + '\n'
+                    meaning += '>' + data.data[i].means[j].examples[0].mean + '\n'
           msg.send meaning
         catch err
           robot.emit 'error', err

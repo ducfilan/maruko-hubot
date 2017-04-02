@@ -1,6 +1,6 @@
 sprintf          = require("sprintf-js").sprintf
 
-constants        = require './common/constants'
+api_urls         = require './common/api_urls'
 http_request     = require './common/http_request'
 static_strings   = require './common/static_strings'
 helper_functions = require './common/helper_functions'
@@ -48,7 +48,7 @@ module.exports = (robot) ->
 
     responser.send static_strings.en.test.alphabet.notice
 
-    alphabet = new AlphabetTest "#{constants.firebaseUrl}/alphabet.json"
+    alphabet = new AlphabetTest api_urls.alphabet
 
     alphabet.takeRandomLetterItem (item) ->
       letter = item[Object.keys(item)[0]]
@@ -66,7 +66,7 @@ module.exports = (robot) ->
 
     userState = robot.brain.get "#{username}_state" || null
     if userState != null
-      alphabet = new AlphabetTest "#{constants.firebaseUrl}/alphabet.json"
+      alphabet = new AlphabetTest api_urls.alphabet
       interactionType   = userState.getInteractionType()
       interactionStatus = userState.getInteractionStatus()
 
