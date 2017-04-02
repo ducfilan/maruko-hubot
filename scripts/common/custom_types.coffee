@@ -5,6 +5,7 @@ custom_types = module.exports =
         hiragana: 'test_alphabet_hiragana'
         katakana: 'test_alphabet_katakana'
       general: 'test_general'
+      vocabulary: 'test_vocabulary'
   interaction_status:
     test:
       not_answered: 'test_status_not_aswered'
