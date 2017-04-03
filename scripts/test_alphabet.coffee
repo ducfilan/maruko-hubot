@@ -39,9 +39,9 @@ module.exports = (robot) ->
     selectedTestKind = responser.match[1]
 
     robot.brain.set "#{username}_state",
-                    new UserState username,
+                    new UserState(username,
                                   custom_types.interaction.test.alphabet[selectedTestKind],
-                                  custom_types.interaction_status.test.not_answered
+                                  custom_types.interaction_status.test.not_answered)
 
     robot.brain.set "#{username}_request_query", userRequestQuery
     robot.brain.set "#{username}_last_selected_test_kind", selectedTestKind
@@ -53,9 +53,9 @@ module.exports = (robot) ->
     alphabet.takeRandomLetterItem (item) ->
       letter = item[Object.keys(item)[0]]
       robot.messageRoom "@#{username}",
-                        sprintf static_strings.en.test.alphabet.ask_a_letter,
+                        sprintf(static_strings.en.test.alphabet.ask_a_letter,
                                 username,
-                                letter[selectedTestKind]
+                                letter[selectedTestKind])
       robot.brain.set "#{username}_last_question_answer", letter['romaji']
 
   robot.hear regex_patterns.anything, (responser) ->
@@ -66,13 +66,14 @@ module.exports = (robot) ->
 
     userState = robot.brain.get "#{username}_state" || null
     if userState != null
+      messageToSend = ''
       alphabet = new AlphabetTest api_urls.alphabet
       interactionType   = userState.getInteractionType()
       interactionStatus = userState.getInteractionStatus()
 
       if alphabet.isAnswering interactionType, interactionStatus
         if answer.includes robot.brain.get("#{username}_last_question_answer")
-          robot.messageRoom "@#{username}", static_strings.en.test.correct_message
+          messageToSend += static_strings.en.test.correct_message + '\n'
         else
           if regex_patterns.stop.test answer
             robot.messageRoom "@#{username}", static_strings.en.test.goodbye
@@ -81,14 +82,16 @@ module.exports = (robot) ->
             robot.brain.set "#{username}_state", userState
             return
 
-          robot.messageRoom "@#{username}",
-            sprintf static_strings.en.test.incorrect_message, robot.brain.get "#{username}_last_question_answer"
+          messageToSend += sprintf(static_strings.en.test.incorrect_message,
+                                   robot.brain.get "#{username}_last_question_answer") + '\n'
 
         alphabet.takeRandomLetterItem (item) ->
           letter = item[Object.keys(item)[0]]
-          
-          robot.messageRoom "@#{username}",
-                            sprintf static_strings.en.test.alphabet.ask_a_letter,
-                                    username,
-                                    letter[robot.brain.get "#{username}_last_selected_test_kind"]
+
+          messageToSend += sprintf(static_strings.en.test.alphabet.ask_a_letter,
+                                   username,
+                                   letter[robot.brain.get "#{username}_last_selected_test_kind"])
+
+          robot.messageRoom("@#{username}", messageToSend) if messageToSend != ''
+
           robot.brain.set "#{username}_last_question_answer", letter['romaji']

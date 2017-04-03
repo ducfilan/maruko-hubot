@@ -65,6 +65,7 @@ module.exports = (robot) ->
 
     userState = robot.brain.get "#{username}_state" || null
     if userState != null
+      messageToSend = ''
       generalTest = new GenralTest api_urls.general_questions
       [interactionType, interactionStatus]   = [userState.getInteractionType(), userState.getInteractionStatus()]
 
@@ -82,7 +83,7 @@ module.exports = (robot) ->
         currentTestItem = testItems[Object.keys(testItems)[currentQuestionNo - 1]]
 
         if answer.includes currentTestItem.correct
-          robot.messageRoom "@#{username}", static_strings.en.test.correct_message
+          messageToSend += static_strings.en.test.correct_message + '\n'
         else
           if regex_patterns.stop.test answer
             robot.messageRoom "@#{username}", static_strings.en.test.goodbye
@@ -91,8 +92,7 @@ module.exports = (robot) ->
             robot.brain.set "#{username}_state", userState
             return
 
-          robot.messageRoom "@#{username}",
-            sprintf static_strings.en.test.incorrect_message, currentTestItem.correct
+          messageToSend += sprintf(static_strings.en.test.incorrect_message, currentTestItem.correct) + '\n'
 
         savedTestItems = robot.brain.get "#{username}_test_general_items"
         nextItem = savedTestItems[Object.keys(savedTestItems)[robot.brain.get "#{username}_test_general_current_question_no"]]
@@ -100,4 +100,6 @@ module.exports = (robot) ->
         robot.brain.set("#{username}_test_general_current_question_no",
                         robot.brain.get("#{username}_test_general_current_question_no") + 1)
 
-        robot.messageRoom "@#{username}", generalTest.formatQuestion nextItem
+        messageToSend += generalTest.formatQuestion(nextItem)
+
+        robot.messageRoom("@#{username}", messageToSend) if messageToSend != ''

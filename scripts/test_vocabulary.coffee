@@ -89,6 +89,7 @@ module.exports = (robot) ->
 
     userState = robot.brain.get "#{username}_state" || null
     if userState != null
+      messageToSend = ''
       vocabularyTest = new VocabularyTest api_urls.lessons.vocabulary
       [interactionType, interactionStatus] = [userState.getInteractionType(), userState.getInteractionStatus()]
 
@@ -105,9 +106,9 @@ module.exports = (robot) ->
 
         currentTestItem = testItems[Object.keys(testItems)[currentQuestionNo - 1]]
 
-        answer = vocabularyTest.simplifyText answer if regex_patterns.common.latin_chars.test answer
-        if answer.includes vocabularyTest.simplifyText(currentTestItem.term)
-          robot.messageRoom "@#{username}", static_strings.en.test.correct_message
+        simplifiedAnswer = vocabularyTest.simplifyText answer if regex_patterns.common.latin_chars.test answer
+        if simplifiedAnswer.includes vocabularyTest.simplifyText(currentTestItem.term)
+          messageToSend += static_strings.en.test.correct_message + '\n'
         else
           if regex_patterns.stop.test answer
             robot.messageRoom "@#{username}", static_strings.en.test.goodbye
@@ -116,8 +117,7 @@ module.exports = (robot) ->
             robot.brain.set "#{username}_state", userState
             return
 
-          robot.messageRoom "@#{username}",
-            sprintf static_strings.en.test.incorrect_message, currentTestItem.term
+          messageToSend += sprintf(static_strings.en.test.incorrect_message, currentTestItem.term) + '\n'
 
         savedVocabularyItems = robot.brain.get "#{username}_vocabulary_items"
         nextIndex = Object.keys(savedVocabularyItems)[robot.brain.get "#{username}_vocabulary_current_item_no"]
@@ -126,4 +126,6 @@ module.exports = (robot) ->
         robot.brain.set("#{username}_vocabulary_current_item_no",
                         robot.brain.get("#{username}_vocabulary_current_item_no") + 1)
 
-        robot.messageRoom "@#{username}", vocabularyTest.formatQuestion nextItem
+        messageToSend += vocabularyTest.formatQuestion(nextItem) + '\n'
+
+        robot.messageRoom("@#{username}", messageToSend) if messageToSend != ''
