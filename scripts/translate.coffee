@@ -1,12 +1,13 @@
-wanakana = require("wanakana")
+wanakana         = require 'wanakana'
+
+regex_patterns   = require './common/regex_patterns'
 
 module.exports = (robot) ->
-  pattern = new RegExp('trans (.*) to vi', 'i')
   # translate jp to vi
   # -----------------------------
-  robot.respond pattern, (msg) ->
+  robot.respond regex_patterns.translate.jap_to_vie, (msg) ->
     keyword = msg.match[1]
-    if !wanakana.isHiragana(keyword) && !wanakana.isKatakana(keyword)
+    if regex_patterns.common.latin_chars.test keyword
       keyword = wanakana.toHiragana(keyword)
 
     keywordEncode = encodeURIComponent(keyword)
@@ -22,20 +23,18 @@ module.exports = (robot) ->
           for i in [0...data.data.length]
             if data.data[i].phonetic in [keyword]
               for j in [0...data.data[i].means.length]
-                meaning += '**(' + data.data[i].means[j].kind + ') ' + data.data[i].means[j].mean + '\n'
+                meaning += '*(' + data.data[i].means[j].kind + ') ' + data.data[i].means[j].mean + '*\n'
                 if data.data[i].means[j].examples
-                    meaning += '\t' + data.data[i].means[j].examples[0].content + '\n'
-                    meaning += '\t' + data.data[i].means[j].examples[0].mean + '\n'
+                  meaning += '>' + data.data[i].means[j].examples[0].content + '\n'
+                  meaning += '>' + data.data[i].means[j].examples[0].mean + '\n'
           msg.send meaning
         catch err
           robot.emit 'error', err
           msg.send "I don't find any mean"
-
   # ------------------------------------------
   # translate to jp
   # ------------------------------------------
-  jppattern = new RegExp('trans (.*) to jp', 'i')
-  robot.respond jppattern, (msg) ->
+  robot.respond regex_patterns.translate.vie_to_jap, (msg) ->
     keyword = msg.match[1]
     keywordEncode = encodeURIComponent(keyword)
     # msg.send keyword
@@ -50,10 +49,11 @@ module.exports = (robot) ->
           for i in [0...data.data.length]
             if data.data[i].word in [keyword]
               for j in [0...data.data[i].means.length]
-                meaning += '**(' + data.data[i].means[j].kind + ') ' + data.data[i].means[j].mean + '\n'
+                meaning += '*(' + (data.data[i].means[j].kind || '-') + ') ' + data.data[i].means[j].mean + '*\n'
                 if data.data[i].means[j].examples.length > 0
-                    meaning += '\t' + data.data[i].means[j].examples[0].content + '\n'
-                    meaning += '\t' + data.data[i].means[j].examples[0].mean + '\n'
+                  meaning += '>' + data.data[i].means[j].examples[0].content + ': '
+                  meaning += data.data[i].means[j].examples[0].mean + '\n'
+
           msg.send meaning
         catch err
           robot.emit 'error', err
@@ -62,9 +62,8 @@ module.exports = (robot) ->
   # ------------------------------------------
   # Search kanji
   # ------------------------------------------
-  kjpattern = new RegExp('search kanji of (.*)', 'i')
-  robot.respond kjpattern, (msg) ->
-    keyword = msg.match[1]
+  robot.respond regex_patterns.translate.explain_kanji, (msg) ->
+    keyword = msg.match[2]
     keywordEncode = encodeURIComponent(keyword)
     # msg.send keyword
     msg.http("http://mazii.net/api/mazii/#{keywordEncode}/10")
@@ -74,11 +73,11 @@ module.exports = (robot) ->
         try
           data = JSON.parse body
           meaning = ""
-          console.log(data.results.length)
+
           for i in [0...data.results.length]
-            meaning += '** Kanji: ' + data.results[i].kanji + '\n'
-            meaning += '\t+, 訓: ' + data.results[i].kun + '\n'
-            meaning += '\t+, 音: ' + data.results[i].on + '\n'
+            meaning += '*Kanji: ' + data.results[i].kanji + '*\n'
+            meaning += '>*訓*: ' + data.results[i].kun + '\n'
+            meaning += '>*音*: ' + data.results[i].on + '\n'
             # if data.data[i].means[j].examples.length > 0
             #     meaning += '\t' + data.data[i].means[j].examples[0].content + '\n'
             #     meaning += '\t' + data.data[i].means[j].examples[0].mean + '\n'
