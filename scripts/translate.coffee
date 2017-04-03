@@ -25,8 +25,8 @@ module.exports = (robot) ->
               for j in [0...data.data[i].means.length]
                 meaning += '*(' + data.data[i].means[j].kind + ') ' + data.data[i].means[j].mean + '*\n'
                 if data.data[i].means[j].examples
-                    meaning += '>' + data.data[i].means[j].examples[0].content + '\n'
-                    meaning += '>' + data.data[i].means[j].examples[0].mean + '\n'
+                  meaning += '>' + data.data[i].means[j].examples[0].content + '\n'
+                  meaning += '>' + data.data[i].means[j].examples[0].mean + '\n'
           msg.send meaning
         catch err
           robot.emit 'error', err
@@ -52,8 +52,8 @@ module.exports = (robot) ->
               for j in [0...data.data[i].means.length]
                 meaning += '**(' + data.data[i].means[j].kind + ') ' + data.data[i].means[j].mean + '\n'
                 if data.data[i].means[j].examples.length > 0
-                    meaning += '\t' + data.data[i].means[j].examples[0].content + '\n'
-                    meaning += '\t' + data.data[i].means[j].examples[0].mean + '\n'
+                  meaning += '\t' + data.data[i].means[j].examples[0].content + '\n' +
+                  meaning += '\t' + data.data[i].means[j].examples[0].mean + '\n'
           msg.send meaning
         catch err
           robot.emit 'error', err
