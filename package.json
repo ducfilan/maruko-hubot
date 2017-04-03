@@ -19,7 +19,8 @@
     "hubot-scripts": "^2.17.2",
     "hubot-shipit": "^0.2.0",
     "hubot-slack": "^4.3.3",
-    "wanakana" : "latest"
+    "sprintf-js": "^1.0.3",
+    "wanakana": "latest"
   },
   "engines": {
     "node": "0.10.x"
