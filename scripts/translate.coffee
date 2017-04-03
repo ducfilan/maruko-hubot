@@ -1,7 +1,7 @@
 wanakana         = require 'wanakana'
 
 regex_patterns   = require './common/regex_patterns'
-constants   = require './common/constants'
+constants        = require './common/constants'
 
 module.exports = (robot) ->
   # translate jp to vi
@@ -74,6 +74,7 @@ module.exports = (robot) ->
           data = JSON.parse body
           meaning = ""
           exp = constants.exampleKanjiNumber
+          
           for i in [0...data.results.length]
             meaning += '*Kanji: ' + data.results[i].kanji + '*\n'
             meaning += '>*訓*: ' + data.results[i].kun + '\n'
@@ -82,6 +83,7 @@ module.exports = (robot) ->
               exp = data.results[i].examples.length
             for j in [1...exp+1]
               meaning += '>*例' + j + '*: ' + data.results[i].examples[j].p + ' - ' + data.results[i].examples[j].m + '\n'
+
           msg.send meaning
         catch err
           robot.emit 'error', err
