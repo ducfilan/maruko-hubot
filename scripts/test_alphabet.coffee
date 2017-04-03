@@ -86,6 +86,7 @@ module.exports = (robot) ->
 
         alphabet.takeRandomLetterItem (item) ->
           letter = item[Object.keys(item)[0]]
+          
           robot.messageRoom "@#{username}",
                             sprintf static_strings.en.test.alphabet.ask_a_letter,
                                     username,
