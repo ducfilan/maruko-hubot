@@ -1,6 +1,7 @@
 wanakana         = require 'wanakana'
 
 regex_patterns   = require './common/regex_patterns'
+constants   = require './common/constants'
 
 module.exports = (robot) ->
   # translate jp to vi
@@ -18,10 +19,9 @@ module.exports = (robot) ->
         data = null
         try
           data = JSON.parse body
-
           meaning = ""
           for i in [0...data.data.length]
-            if data.data[i].phonetic in [keyword]
+            if data.data[i].phonetic in [keyword] || data.data[i].word in [keyword]
               for j in [0...data.data[i].means.length]
                 meaning += '*(' + data.data[i].means[j].kind + ') ' + data.data[i].means[j].mean + '*\n'
                 if data.data[i].means[j].examples
@@ -73,14 +73,15 @@ module.exports = (robot) ->
         try
           data = JSON.parse body
           meaning = ""
-
+          exp = constants.exampleKanjiNumber
           for i in [0...data.results.length]
             meaning += '*Kanji: ' + data.results[i].kanji + '*\n'
             meaning += '>*訓*: ' + data.results[i].kun + '\n'
             meaning += '>*音*: ' + data.results[i].on + '\n'
-            # if data.data[i].means[j].examples.length > 0
-            #     meaning += '\t' + data.data[i].means[j].examples[0].content + '\n'
-            #     meaning += '\t' + data.data[i].means[j].examples[0].mean + '\n'
+            if data.results[i].examples.length < 5
+              exp = data.results[i].examples.length
+            for j in [1...exp+1]
+              meaning += '>*例' + j + '*: ' + data.results[i].examples[j].p + ' - ' + data.results[i].examples[j].m + '\n'
           msg.send meaning
         catch err
           robot.emit 'error', err
