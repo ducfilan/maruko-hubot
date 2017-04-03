@@ -23,6 +23,17 @@ class VocabularyTest
   formatQuestion: (item) ->
     sprintf static_strings.en.test.vocabulary.ask_a_term, item.meaning
 
+  formatLessonItems: (items) ->
+    formatedLessonString = static_strings.en.show.vocabulary.list_prefix
+    formatedLessonString += '```'
+    for itemKey in Object.keys items
+      item = items[itemKey]
+      formatedLessonString += "#{item.term} (#{item.type}): #{item.meaning}\n"
+
+    formatedLessonString += '```'
+
+    formatedLessonString
+
   simplifyText: (term) ->
     wanakana.toHiragana term.replace regex_patterns.test.simplify_text, ''
 
@@ -49,10 +60,26 @@ module.exports = (robot) ->
 
     vocabularyTest.takeVocabItemsInLesson selectedTestLesson, (items) ->
       robot.brain.set "#{username}_vocabulary_items", items
-      robot.brain.set "#{username}_vocabulary_current_question_no", 1
+      robot.brain.set "#{username}_vocabulary_current_item_no", 1
 
       firstItem = items[Object.keys(items)[0]]
       robot.messageRoom "@#{username}", vocabularyTest.formatQuestion firstItem
+
+  robot.respond regex_patterns.show.vocabulary, (responser) ->
+    username = responser.message.user.name
+    [userRequestQuery, selectedLesson] = [responser.match[0], responser.match[2]]
+
+    robot.brain.set "#{username}_state",
+                    new UserState username,
+                                  custom_types.interaction.show.vocabulary,
+                                  custom_types.interaction_status.show.not_shown
+
+    responser.send static_strings.en.show.vocabulary.notice
+
+    vocabularyTest = new VocabularyTest api_urls.lessons.vocabulary
+
+    vocabularyTest.takeVocabItemsInLesson selectedLesson, (items) ->
+      robot.messageRoom "@#{username}", vocabularyTest.formatLessonItems items
 
   robot.hear regex_patterns.anything, (responser) ->
     username = responser.message.user.name
@@ -67,7 +94,7 @@ module.exports = (robot) ->
 
       if vocabularyTest.isAnswering interactionType, interactionStatus
         testItems = robot.brain.get "#{username}_vocabulary_items"
-        currentQuestionNo = robot.brain.get "#{username}_vocabulary_current_question_no"
+        currentQuestionNo = robot.brain.get "#{username}_vocabulary_current_item_no"
 
         if currentQuestionNo >= Object.keys(testItems).length
           robot.messageRoom "@#{username}", static_strings.en.test.out_of_questions
@@ -93,10 +120,10 @@ module.exports = (robot) ->
             sprintf static_strings.en.test.incorrect_message, currentTestItem.term
 
         savedVocabularyItems = robot.brain.get "#{username}_vocabulary_items"
-        nextIndex = Object.keys(savedVocabularyItems)[robot.brain.get "#{username}_vocabulary_current_question_no"]
+        nextIndex = Object.keys(savedVocabularyItems)[robot.brain.get "#{username}_vocabulary_current_item_no"]
         nextItem = savedVocabularyItems[nextIndex]
 
-        robot.brain.set("#{username}_vocabulary_current_question_no",
-                        robot.brain.get("#{username}_vocabulary_current_question_no") + 1)
+        robot.brain.set("#{username}_vocabulary_current_item_no",
+                        robot.brain.get("#{username}_vocabulary_current_item_no") + 1)
 
         robot.messageRoom "@#{username}", vocabularyTest.formatQuestion nextItem
