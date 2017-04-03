@@ -5,6 +5,8 @@ regex_patterns = module.exports =
     general:  /test.* general.* lesson.* (\d+)/i
     vocabulary: /test.* vocabulary.* lesson.* (\d+)/
     simplify_text: /[～ 　	（）\(\)「」]/g
+  show:
+    vocabulary: /(show|view).* vocabulary.* lesson.* (\d+)/
   translate:
     jap_to_vie: /trans (.*) to vi/i
   common:

@@ -13,6 +13,10 @@ static_strings = module.exports =
       incorrect_message: "It's not the right answer :( the answer is '%1$s' (｡•́︿•̀｡)"
       goodbye: "Goodbye, ask me to check your knowledge anytime you want (ﾉ^ヮ^)ﾉ*:・ﾟ✧"
       out_of_questions: "You've taken all question in the lesson! Congratulations! (ﾉ^ヮ^)ﾉ*:・ﾟ✧"
+    show:
+      vocabulary:
+        notice: "Okay. I'll show you words in your selected lesson. When you're ready, please ask me to test ᕕ( ᐛ )ᕗ"
+        list_prefix: "*>Below is all words in the lesson you picked, learn by heart all words and ask me to test when you're ready (ﾉ^ヮ^)ﾉ*"
     error_message:
       unexpected_trouble: "I'm so sorry, I am in trouble now, I will help you when I feel normal again :("
     new_member:
