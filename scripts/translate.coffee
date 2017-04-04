@@ -74,15 +74,17 @@ module.exports = (robot) ->
           data = JSON.parse body
           meaning = ""
           exp = constants.exampleKanjiNumber
-          
+
           for i in [0...data.results.length]
-            meaning += '*Kanji: ' + data.results[i].kanji + '*\n'
-            meaning += '>*訓*: ' + data.results[i].kun + '\n'
-            meaning += '>*音*: ' + data.results[i].on + '\n'
+            meaning += '*Kanji: ' + data.results[i].kanji + '*\n---\n'
+            meaning += '*訓*: ' + data.results[i].kun + '\n'
+            meaning += '*音*: ' + data.results[i].on + '\n'
             if data.results[i].examples.length < 5
               exp = data.results[i].examples.length
             for j in [1...exp+1]
-              meaning += '>*例' + j + '*: ' + data.results[i].examples[j].p + ' - ' + data.results[i].examples[j].m + '\n'
+              exampleItem = data.results[i].examples[j]
+              meaning += '>*例' + j + '*: ' + exampleItem.w + '(' + exampleItem.p + ') [' +
+                exampleItem.h + '] - ' + data.results[i].examples[j].m + '\n'
 
           msg.send meaning
         catch err
