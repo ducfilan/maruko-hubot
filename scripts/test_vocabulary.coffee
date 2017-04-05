@@ -1,3 +1,7 @@
+# Commands:
+#   @maruko test vocabulary lesson n - Test vocabulary in Minna no Nihongo lesson number n.
+#   @maruko show vocabulary lesson n - Show all words in Minna no Nihongo lesson number n.
+
 sprintf          = require("sprintf-js").sprintf
 wanakana         = require 'wanakana'
 
@@ -26,6 +30,7 @@ class VocabularyTest
   formatLessonItems: (items) ->
     formatedLessonString = static_strings.en.show.vocabulary.list_prefix
     formatedLessonString += '```'
+
     for itemKey in Object.keys items
       item = items[itemKey]
       formatedLessonString += "#{item.term} (#{item.type}): #{item.meaning}\n"

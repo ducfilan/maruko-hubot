@@ -1,3 +1,8 @@
+# Commands:
+#   @maruko translate your-word to Vietnamese - Translate your-word from Japanese to get meaning and examples in Vietnamese.
+#   @maruko translate your-word to Japanese - Translate your-word from Vietnamese to get meaning and examples in Japanese.
+#   @maruko explain kanji your-kanji - Explain the kanji you pick to find meanings, on sound, kun sound and compound words.
+
 wanakana         = require 'wanakana'
 
 regex_patterns   = require './common/regex_patterns'

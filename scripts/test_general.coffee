@@ -1,3 +1,6 @@
+# Commands:
+#   @maruko test general lesson n - Test general questions in lesson number n.
+
 sprintf          = require("sprintf-js").sprintf
 
 api_urls         = require './common/api_urls'

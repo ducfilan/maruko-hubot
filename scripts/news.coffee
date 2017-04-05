@@ -1,5 +1,5 @@
-
-Promise = require('bluebird')
+# Commands:
+#   @maruko read news - Get the latest highlight news and a webpage url to the entire news.
 
 module.exports = (robot) ->
   pattern = new RegExp('read news', 'i')

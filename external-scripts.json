@@ -1,8 +1,5 @@
 [
-  "hubot-diagnostics",
+  "hubot-help",
   "hubot-heroku-keepalive",
-  "hubot-pugme",
-  "hubot-redis-brain",
-  "hubot-rules",
-  "hubot-reload-scripts"
+  "hubot-redis-brain"
 ]

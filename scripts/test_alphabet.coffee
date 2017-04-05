@@ -1,3 +1,7 @@
+# Commands:
+#   @maruko test alphabet hiragana - Test randomly Japanese character in Hiragana.
+#   @maruko test alphabet katakana - Test randomly Japanese character in Katakana.
+
 sprintf          = require("sprintf-js").sprintf
 
 api_urls         = require './common/api_urls'
@@ -25,6 +29,7 @@ class AlphabetTest
       apiUrl = self.baseApiUrl + filterDataPart
       http_request.getData apiUrl, (jsonData) ->
         callback jsonData
+
   isAnswering: (interactionType, interactionStatus) ->
     (
       interactionType == custom_types.interaction.test.alphabet.hiragana or
